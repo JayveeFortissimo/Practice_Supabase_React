@@ -6,6 +6,7 @@ import AboutPage from "@/page/AboutPage";
 import Blogs from "@/page/Blogs";
 import Login from "@/page/auth/Login";
 import Register from "@/page/auth/Register";
+import Profile from "@/page/Profile";
 
 function App() {
   const routes = createBrowserRouter([
@@ -33,6 +34,10 @@ function App() {
           path: "register",
           element: <Register />,
         },
+        {
+          path: "profile",
+          element: <Profile />,
+        }
       ],
     },
   ]);

@@ -1,7 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
-const initialState = {
+
+interface States {
+  access_token: string;
+  isLoading: boolean;
+}
+
+const initialState: States = {
   access_token: "",
+  isLoading: true,
 };
 
 export const userAuthentication = createSlice({

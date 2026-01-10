@@ -159,12 +159,9 @@ const Navbar = ({
 
               <DropdownMenuContent align="end">
                 <DropdownMenuItem className="hover:cursor-pointer" asChild>
-                  <div onClick={() => console.log("profile")}>My Profile</div>
+                  <div onClick={() => navigate("/profile")}>My Profile</div>
                 </DropdownMenuItem>
 
-                <DropdownMenuItem className="hover:cursor-pointer" asChild>
-                  <div>Settings</div>
-                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="hover:cursor-pointer text-logout"
