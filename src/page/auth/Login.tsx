@@ -1,5 +1,6 @@
 import Container from "@/components/common/Container";
 import LoginForm from "@/components/sections/LoginForm";
+import LOGO from "@/assets/Image/LOGO.png";
 
 const Login = () => {
   return (
@@ -11,11 +12,11 @@ const Login = () => {
           </h1>
 
           <div className="absolute inset-0 flex items-center justify-center">
-            {/* <img
-            src={LogoImage}
+            <img
+            src={LOGO}
             alt="Logo Image"
             className="h-full w-full max-w-[90%] object-contain"
-          /> */}
+          />
           </div>
         </section>
 

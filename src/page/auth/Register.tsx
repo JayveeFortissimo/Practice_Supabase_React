@@ -1,5 +1,5 @@
 import RegisterForm from "@/components/sections/RegisterForm";
-
+import LOGO2 from "@/assets/Image/LOGO2.png"
 import Container from "@/components/common/Container";
 
 const Register = () => {
@@ -12,11 +12,11 @@ const Register = () => {
           </h1>
 
           <div className="absolute inset-0 flex items-center justify-center">
-            {/* <img
-              src={LogoImage}
+            <img
+              src={LOGO2}
               alt="Logo Image"
               className="h-full w-full max-w-[90%] object-contain"
-            /> */}
+            />
           </div>
         </section>
 

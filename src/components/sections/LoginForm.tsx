@@ -18,8 +18,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import supabase from "@/Supabase";
 import { toast } from "sonner";
 
+import { useDispatch } from "react-redux";
+import { setAccesToken } from "@/store/authentication";
+
 const LoginForm = () => {
   const router = useNavigate();
+  const dispatch = useDispatch();
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -33,14 +37,14 @@ const LoginForm = () => {
 
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
 
-      const {error} = await supabase.auth.signInWithPassword({email:values.email,password:values.password});
+    const {data, error} = await supabase.auth.signInWithPassword({email:values.email,password:values.password});
      
     if (error) {
       console.log(error);
       toast.error("Cannot Login! ");
       return;
     }
-
+     dispatch(setAccesToken(data.session?.access_token as string));
     router("/");
     reset();
   }

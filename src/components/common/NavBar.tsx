@@ -27,6 +27,20 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useNavigate } from "react-router-dom";
+
+import { useSelector } from "react-redux";
+import type { RootState } from "@/store/storeMain";
+
+import supabase from "@/Supabase";
 interface MenuItem {
   title: string;
   url: string;
@@ -59,10 +73,10 @@ interface Navbar1Props {
 
 const Navbar = ({
   logo = {
-    url: "https://www.shadcnblocks.com",
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/shadcnblockscom-icon.svg",
-    alt: "logo",
-    title: "Pro Musicians",
+    url: "",
+    src: "https://www.pngkey.com/png/detail/117-1173665_music-logo-png-music-logo-design-png.png",
+    alt: "Musicians",
+    title: "Musicians",
   },
   menu = [
     { title: "Home", url: "/" },
@@ -81,8 +95,22 @@ const Navbar = ({
   },
   className,
 }: Navbar1Props) => {
+
+  const navigate = useNavigate();
+  const accessToken = useSelector(
+    (state: RootState) => state.userAuthentication.access_token
+  );
+
+
+
+  const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    navigate("/login");
+  };
+
   return (
-    <section className={cn("py-4", className)}>
+    <section className={cn("py-4 px-5 md:px-0", className)}>
       <div className="container">
         {/* Desktop Menu */}
         <nav className="hidden items-center justify-between lg:flex">
@@ -106,14 +134,47 @@ const Navbar = ({
               </NavigationMenu>
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <a href={auth.login.url}>{auth.login.title}</a>
-            </Button>
-            <Button asChild size="sm">
-              <a href={auth.signup.url}>{auth.signup.title}</a>
-            </Button>
-          </div>
+          {accessToken === "" || accessToken === undefined ? (
+            <div className="flex gap-2">
+              <Button asChild variant="outline" size="sm">
+                <a href={auth.login.url}>{auth.login.title}</a>
+              </Button>
+              <Button asChild size="sm">
+                <a href={auth.signup.url}>{auth.signup.title}</a>
+              </Button>
+            </div>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="cursor-pointer">
+                  <AvatarImage
+                    src="https://github.com/shadcn.png"
+                    alt="@shadcn"
+                  />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="hover:cursor-pointer" asChild>
+                  <div onClick={() => console.log("profile")}>My Profile</div>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem className="hover:cursor-pointer" asChild>
+                  <div>Settings</div>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="hover:cursor-pointer text-logout"
+                  onClick={() => {
+                    signOut()
+                  }}
+                >
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </nav>
 
         {/* Mobile Menu */}
@@ -154,14 +215,24 @@ const Navbar = ({
                     {menu.map((item) => renderMobileMenuItem(item))}
                   </Accordion>
 
-                  <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <a href={auth.login.url}>{auth.login.title}</a>
-                    </Button>
-                    <Button asChild>
-                      <a href={auth.signup.url}>{auth.signup.title}</a>
-                    </Button>
-                  </div>
+                  {accessToken === "" || accessToken === undefined ? (
+                    <div className="flex flex-col gap-3">
+                      <Button asChild variant="outline">
+                        <a href={auth.login.url}>{auth.login.title}</a>
+                      </Button>
+                      <Button asChild>
+                        <a href={auth.signup.url}>{auth.signup.title}</a>
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3">
+                      <Button 
+                      onClick={()=>signOut()}
+                      asChild className="bg-neutral-700 hover:bg-[#BD3144] transition duration-700 ease-in-out">
+                        Logout
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </SheetContent>
             </Sheet>
