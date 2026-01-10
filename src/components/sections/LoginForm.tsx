@@ -41,9 +41,8 @@ const LoginForm = () => {
       return;
     }
 
-    router("/login");
+    router("/");
     reset();
-    console.log("Hello", data);
   }
 
   return (

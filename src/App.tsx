@@ -4,7 +4,7 @@ import Outlets from "@/Outlets";
 import Homepage from "@/page/HomePage";
 import AboutPage from "@/page/AboutPage";
 import Blogs from "@/page/Blogs";
-import Login from "@/page/auth/login";
+import Login from "@/page/auth/Login";
 import Register from "@/page/auth/Register";
 
 function App() {
