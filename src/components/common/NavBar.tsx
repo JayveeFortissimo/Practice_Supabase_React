@@ -39,6 +39,8 @@ import { useNavigate } from "react-router-dom";
 
 import { useSelector } from "react-redux";
 import type { RootState } from "@/store/storeMain";
+import { setAccesToken } from "@/store/authentication";
+import { useDispatch } from "react-redux";
 
 import supabase from "@/Supabase";
 interface MenuItem {
@@ -96,17 +98,17 @@ const Navbar = ({
   className,
 }: Navbar1Props) => {
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const accessToken = useSelector(
     (state: RootState) => state.userAuthentication.access_token
   );
 
-
-
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     navigate("/login");
+     dispatch(setAccesToken(""));
   };
 
   return (
