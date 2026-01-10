@@ -33,7 +33,7 @@ const LoginForm = () => {
 
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
 
-      const {data,error} = await supabase.auth.signInWithPassword({email:values.email,password:values.password});
+      const {error} = await supabase.auth.signInWithPassword({email:values.email,password:values.password});
      
     if (error) {
       console.log(error);
