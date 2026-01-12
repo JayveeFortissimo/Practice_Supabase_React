@@ -7,6 +7,7 @@ import Blogs from "@/page/Blogs";
 import Login from "@/page/auth/Login";
 import Register from "@/page/auth/Register";
 import Profile from "@/page/Profile";
+import ViewMore from "@/page/ViewMore";
 
 function App() {
   const routes = createBrowserRouter([
@@ -27,6 +28,10 @@ function App() {
           element: <Blogs />,
         },
         {
+          path: "blogs/:blogId",
+          element: <ViewMore />,
+        },
+        {
           path: "login",
           element: <Login />,
         },
@@ -37,7 +42,7 @@ function App() {
         {
           path: "profile",
           element: <Profile />,
-        }
+        },
       ],
     },
   ]);

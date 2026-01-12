@@ -14,12 +14,12 @@ import { useDispatch } from "react-redux";
 const Outlets = () => {
   const params = useLocation();
   const dispatch = useDispatch();
-  const notAllowedNavars = ["/login", "/register", "/searchpage", "/admin"];
+  const notAllowedNavars = ["/login", "/register"];
 
   useEffect(() => {
     (async () => {
       const { data } = await supabase.auth.getSession();
-      dispatch(setAccesToken(data.session?.access_token as string));
+      dispatch(setAccesToken({accessToken:data.session?.access_token as string, userId: data.session?.user.id as string}));
     })();
   }, []);
 

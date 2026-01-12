@@ -3,6 +3,7 @@
 import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { NotebookPen, Pen } from 'lucide-react';
 
 import {
   Accordion,
@@ -41,7 +42,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/storeMain";
 import { setAccesToken } from "@/store/authentication";
 import { useDispatch } from "react-redux";
-
+import { setOpenAddBlog, setOpenUpdateBlog } from "@/store/blogs";
+import { useLocation } from "react-router-dom"
 import supabase from "@/Supabase";
 interface MenuItem {
   title: string;
@@ -98,6 +100,8 @@ const Navbar = ({
   className,
 }: Navbar1Props) => {
 
+  const addNotallowed = ["/login", "/register", "/","/about","/blogs"];
+  const params = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const accessToken = useSelector(
@@ -108,7 +112,7 @@ const Navbar = ({
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     navigate("/login");
-     dispatch(setAccesToken(""));
+     dispatch(setAccesToken({accessToken:"", userId:""}));
   };
 
   return (
@@ -146,7 +150,8 @@ const Navbar = ({
               </Button>
             </div>
           ) : (
-            <DropdownMenu>
+           <div className="flex items-center gap-5">
+             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
                   <AvatarImage
@@ -173,6 +178,17 @@ const Navbar = ({
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+         {
+          addNotallowed.includes(params.pathname) ? undefined :
+           (
+               <div className="flex items-center gap-5">
+              <NotebookPen className="cursor-pointer" onClick={()=> dispatch(setOpenAddBlog(true))}/>
+                <Pen className="cursor-pointer" onClick={()=> dispatch(setOpenUpdateBlog(true))}/>
+            </div>
+           )
+         }
+           </div>
           )}
         </nav>
 
