@@ -7,10 +7,11 @@ import { fetchBlogs } from "@/store/blogs";
 import { useEffect } from "react";
 import image from "@/assets/Image/Add.png";
 import BlogCards from "@/components/common/BlogCards";
+import { SkeletonCardGrid } from "@/components/common/SkeletonLoading";
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const { openAddBlog, openUpdateBlog, blogs } = useSelector(
+  const { openAddBlog, openUpdateBlog, blogs, isLoading } = useSelector(
     (state: RootState) => state.createBlog
   );
   const { user_id } = useSelector(
@@ -52,7 +53,9 @@ const Profile = () => {
       </header>
 
       <section className="border min-h-[30rem] w-full p-3">
-        {myBlogs.length <= 0 && (
+        {isLoading ? (
+          <SkeletonCardGrid count={6} />
+        ) : blogs.length === 0 ? (
           <div className="border min-h-[30rem] w-full p-3 flex flex-col gap-2 justify-center items-center">
             <img
               src={image}
@@ -64,28 +67,29 @@ const Profile = () => {
             </p>
             <Button className="mt-5">Create Blogs</Button>
           </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {myBlogs?.length > 0 &&
+              myBlogs?.map((blog) => {
+                return (
+                  <div key={blog?.blog_id}>
+                    <BlogCards
+                      image={blog?.blog_img}
+                      altImage="Blog Card"
+                      title={blog?.blog_title}
+                      subTitle={blog?.blog_subtitle}
+                      description={blog?.blog_description}
+                      btnText=""
+                      btnUrl=""
+                      page="profile"
+                      dispatch={dispatch}
+                      setOpenUpdateBlog={setOpenUpdateBlog}
+                    />
+                  </div>
+                );
+              })}
+          </div>
         )}
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {myBlogs?.length > 0 &&
-            myBlogs?.length > 0 &&
-            myBlogs?.map((blog) => {
-              return (
-                <div key={blog.blog_id}>
-                  <BlogCards
-                    image={blog.blog_img}
-                    altImage="Blog Card"
-                    title={blog.blog_title}
-                    subTitle={blog.blog_subtitle}
-                    description={blog.blog_description}
-                    btnText="" 
-                    btnUrl={""}
-                    page="profile"
-                  />
-                </div>
-              );
-            })}
-        </div>
       </section>
     </div>
   );

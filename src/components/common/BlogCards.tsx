@@ -1,23 +1,27 @@
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 const BlogCards = ({
+  page,
   image,
-  altImage,
   title,
+  btnUrl,
+  btnText,
+  altImage,
   subTitle,
   description,
-  btnText,
-  btnUrl,
-  page,
+  dispatch,
+  setOpenUpdateBlog,
 }: {
+  page: "default" | "profile";
   image: string;
-  altImage: string;
   title: string;
+  altImage: string;
+  btnUrl: string;
+  btnText: string;
   subTitle: string;
   description: string;
-  btnText: string;
-  btnUrl: string;
-  page: "default" | "profile";
+  dispatch?: any;
+  setOpenUpdateBlog?: any;
 }) => {
   const navigate = useNavigate();
   return (
@@ -43,7 +47,9 @@ const BlogCards = ({
 
         {page === "profile" ? (
           <div className="mt-6 flex gap-2">
-            <Button>Edit</Button>
+            <Button onClick={() => dispatch(setOpenUpdateBlog(true))}>
+              Edit
+            </Button>
             <Button className="bg-[#BD3144]">Delete</Button>
           </div>
         ) : (
