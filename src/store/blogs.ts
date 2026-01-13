@@ -129,7 +129,6 @@ export const createBlog = createSlice({
       .addCase(
         fetchBlogs.fulfilled,
         (state: any, action: PayloadAction<any[]>) => {
-          console.log("ALL DATAS:", action.payload);
           state.isLoading = false;
           state.blogs = action.payload;
         }
@@ -142,5 +141,4 @@ export const createBlog = createSlice({
 
 export default createBlog.reducer;
 
-export const { setOpenAddBlog, setOpenUpdateBlog, setInputs } =
-  createBlog.actions;
+export const { setOpenAddBlog, setOpenUpdateBlog, setInputs } = createBlog.actions;

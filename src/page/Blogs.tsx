@@ -30,6 +30,7 @@ const Blogs = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {blogs.map((blog) => {
+            console.log("All IDS: ", blog.blog_id);
             return (
               <div
                 key={blog.blog_id}

@@ -3,7 +3,7 @@
 import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { NotebookPen, Pen } from 'lucide-react';
+import { NotebookPen, Pen } from "lucide-react";
 
 import {
   Accordion,
@@ -43,7 +43,7 @@ import type { RootState } from "@/store/storeMain";
 import { setAccesToken } from "@/store/authentication";
 import { useDispatch } from "react-redux";
 import { setOpenAddBlog, setOpenUpdateBlog } from "@/store/blogs";
-import { useLocation } from "react-router-dom"
+import { useLocation } from "react-router-dom";
 import supabase from "@/Supabase";
 interface MenuItem {
   title: string;
@@ -99,8 +99,7 @@ const Navbar = ({
   },
   className,
 }: Navbar1Props) => {
-
-  const addNotallowed = ["/login", "/register", "/","/about","/blogs"];
+  const addNotallowed = ["/login", "/register", "/", "/about", "/blogs"];
   const params = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -112,7 +111,7 @@ const Navbar = ({
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     navigate("/login");
-     dispatch(setAccesToken({accessToken:"", userId:""}));
+    dispatch(setAccesToken({ accessToken: "", userId: "" }));
   };
 
   return (
@@ -150,52 +149,53 @@ const Navbar = ({
               </Button>
             </div>
           ) : (
-           <div className="flex items-center gap-5">
-             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage
-                    src="https://github.com/shadcn.png"
-                    alt="@shadcn"
+            <div className="flex items-center gap-5">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage
+                      src="https://github.com/shadcn.png"
+                      alt="@shadcn"
+                    />
+                    <AvatarFallback>CN</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem className="hover:cursor-pointer" asChild>
+                    <div onClick={() => navigate("/profile")}>My Profile</div>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="hover:cursor-pointer text-logout"
+                    onClick={() => {
+                      signOut();
+                    }}
+                  >
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              {addNotallowed.includes(params.pathname) ? undefined : (
+                <div className="flex items-center gap-5">
+                  <NotebookPen
+                    className="cursor-pointer"
+                    onClick={() => dispatch(setOpenAddBlog(true))}
                   />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem className="hover:cursor-pointer" asChild>
-                  <div onClick={() => navigate("/profile")}>My Profile</div>
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="hover:cursor-pointer text-logout"
-                  onClick={() => {
-                    signOut()
-                  }}
-                >
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-         {
-          addNotallowed.includes(params.pathname) ? undefined :
-           (
-               <div className="flex items-center gap-5">
-              <NotebookPen className="cursor-pointer" onClick={()=> dispatch(setOpenAddBlog(true))}/>
-                <Pen className="cursor-pointer" onClick={()=> dispatch(setOpenUpdateBlog(true))}/>
+                  <Pen
+                    className="cursor-pointer"
+                    onClick={() => dispatch(setOpenUpdateBlog(true))}
+                  />
+                </div>
+              )}
             </div>
-           )
-         }
-           </div>
           )}
         </nav>
 
-        {/* Mobile Menu */}
         <div className="block lg:hidden">
           <div className="flex items-center justify-between">
-            {/* Logo */}
             <a href={logo.url} className="flex items-center gap-2">
               <img
                 src={logo.src}
@@ -241,9 +241,16 @@ const Navbar = ({
                     </div>
                   ) : (
                     <div className="flex flex-col gap-3">
-                      <Button 
-                      onClick={()=>signOut()}
-                      asChild className="bg-neutral-700 hover:bg-[#BD3144] transition duration-700 ease-in-out">
+                      <Button
+                        onClick={() => navigate("/profile")}
+                        variant="outline"
+                      >
+                        Profile
+                      </Button>
+                      <Button
+                        onClick={() => signOut()}
+                        className="bg-neutral-700 hover:bg-[#BD3144] transition duration-700 ease-in-out"
+                      >
                         Logout
                       </Button>
                     </div>
