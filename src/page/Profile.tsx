@@ -5,12 +5,11 @@ import { setOpenAddBlog, setOpenUpdateBlog } from "@/store/blogs";
 import { Button } from "@/components/ui/button";
 import { fetchBlogs } from "@/store/blogs";
 import { useEffect } from "react";
-import { Pen } from "lucide-react";
 import image from "@/assets/Image/Add.png";
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const { openAddBlog, openUpdateBlog, blogs, isLoading } = useSelector(
+  const { openAddBlog, openUpdateBlog, blogs } = useSelector(
     (state: RootState) => state.createBlog
   );
   const { user_id } = useSelector(
