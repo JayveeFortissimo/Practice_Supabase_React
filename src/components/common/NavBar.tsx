@@ -3,7 +3,7 @@
 import { Menu } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { NotebookPen, Pen } from "lucide-react";
+import { NotebookPen } from "lucide-react";
 
 import {
   Accordion,
@@ -42,7 +42,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/storeMain";
 import { setAccesToken } from "@/store/authentication";
 import { useDispatch } from "react-redux";
-import { setOpenAddBlog, setOpenUpdateBlog } from "@/store/blogs";
+import { setOpenAddBlog } from "@/store/blogs";
 import { useLocation } from "react-router-dom";
 import supabase from "@/Supabase";
 interface MenuItem {
@@ -117,10 +117,8 @@ const Navbar = ({
   return (
     <section className={cn("py-4 px-5 md:px-0", className)}>
       <div className="container">
-        {/* Desktop Menu */}
         <nav className="hidden items-center justify-between lg:flex">
           <div className="flex items-center gap-6">
-            {/* Logo */}
             <a href={logo.url} className="flex items-center gap-2">
               <img
                 src={logo.src}
@@ -183,10 +181,6 @@ const Navbar = ({
                   <NotebookPen
                     className="cursor-pointer"
                     onClick={() => dispatch(setOpenAddBlog(true))}
-                  />
-                  <Pen
-                    className="cursor-pointer"
-                    onClick={() => dispatch(setOpenUpdateBlog(true))}
                   />
                 </div>
               )}

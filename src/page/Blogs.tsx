@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchBlogs } from "@/store/blogs";
 import { Button } from "@/components/ui/button";
-import SpinnerCircle2 from "@/components/common/Loading";
+import { SkeletonCardGrid } from "@/components/common/SkeletonLoading";
 
 const Blogs = () => {
   const navigate = useNavigate();
@@ -14,23 +14,20 @@ const Blogs = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchBlogs() as any);
+    dispatch(fetchBlogs() as never);
   }, [dispatch]);
-
-  if (isLoading) {
-    return <SpinnerCircle2 />;
-  }
 
   return (
     <div className="min-h-screen container mx-auto p-2">
-      {blogs.length === 0 ? (
+      {isLoading ? (
+        <SkeletonCardGrid count={6} />
+      ) : blogs.length === 0 ? (
         <div className="text-center py-8">
           <p className="text-gray-500">No blogs found.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {blogs.map((blog) => {
-            console.log("All IDS: ", blog.blog_id);
             return (
               <div
                 key={blog.blog_id}
@@ -47,17 +44,26 @@ const Blogs = () => {
                     <p className="text-gray-500">No image available</p>
                   </div>
                 )}
+
                 <div className="p-4">
                   <h2 className="text-xl font-semibold mb-2">
                     {blog.blog_title}
                   </h2>
+
                   {blog.blog_subtitle && (
                     <p className="text-gray-600 mb-2">{blog.blog_subtitle}</p>
                   )}
+
                   <p className="text-gray-700 line-clamp-1 break-word">
                     {blog.blog_description}
                   </p>
-                  <Button className="mt-6" onClick={()=> navigate(`/blogs/${blog.blog_id}`)}>Read More</Button>
+
+                  <Button
+                    className="mt-6"
+                    onClick={() => navigate(`/blogs/${blog.blog_id}`)}
+                  >
+                    Read More
+                  </Button>
                 </div>
               </div>
             );

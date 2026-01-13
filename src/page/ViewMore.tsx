@@ -3,15 +3,16 @@ import { useSelector, useDispatch } from "react-redux";
 import type { RootState } from "@/store/storeMain";
 import { useEffect } from "react";
 import { fetchBlogs } from "@/store/blogs";
+import { DynamicSkeletone } from "@/components/common/SkeletonLoading";
 
 const ViewMore = () => {
   const dispatch = useDispatch();
 
   const { blogId } = useParams<{ blogId: string }>();
-  const { blogs } = useSelector((state: RootState) => state.createBlog);
+  const { blogs, isLoading } = useSelector((state: RootState) => state.createBlog);
 
   useEffect(() => {
-    dispatch(fetchBlogs() as any);
+    dispatch(fetchBlogs() as never);
   }, [dispatch, blogId]);
 
   const blogIdNumber = blogId ? parseInt(blogId) : null;
@@ -19,7 +20,11 @@ const ViewMore = () => {
 
   return (
     <div className="min-h-screen container mx-auto p-2 flex justify-center">
-     <div className="w-full flex flex-col items-center">
+    {
+      isLoading ? (
+        <DynamicSkeletone />
+      ) : (
+         <div className="w-full flex flex-col items-center">
        <div className="rounded-lg overflow-hidden w-full lg:h-[40rem] mb-4">
         <img src={findBlog?.blog_img} alt="" className="w-full object-cover"/>
        </div>
@@ -34,6 +39,8 @@ const ViewMore = () => {
         </p>
       </div>
      </div>
+      )
+    }
     </div>
   );
 };
