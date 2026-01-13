@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { fetchBlogs } from "@/store/blogs";
 import { useEffect } from "react";
 import image from "@/assets/Image/Add.png";
+import BlogCards from "@/components/common/BlogCards";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -68,38 +69,19 @@ const Profile = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {myBlogs?.length > 0 &&
             myBlogs?.length > 0 &&
-            blogs?.map((blog) => {
+            myBlogs?.map((blog) => {
               return (
-                <div
-                  key={blog.blog_id}
-                  className="border rounded-lg overflow-hidden mb-4"
-                >
-                  {blog.blog_img ? (
-                    <img
-                      src={blog.blog_img}
-                      alt={blog.blog_title || "Blog image"}
-                      className="w-full h-64 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-64 bg-gray-200 flex items-center justify-center">
-                      <p className="text-gray-500">No image available</p>
-                    </div>
-                  )}
-                  <div className="p-4">
-                    <h2 className="text-xl font-semibold mb-2">
-                      {blog.blog_title}
-                    </h2>
-                    {blog.blog_subtitle && (
-                      <p className="text-gray-600 mb-2">{blog.blog_subtitle}</p>
-                    )}
-                    <p className="text-gray-700 line-clamp-1 break-word">
-                      {blog.blog_description}
-                    </p>
-                    <div className="mt-6 flex gap-2">
-                      <Button>Edit</Button>
-                      <Button className="bg-[#BD3144]">Delete</Button>
-                    </div>
-                  </div>
+                <div key={blog.blog_id}>
+                  <BlogCards
+                    image={blog.blog_img}
+                    altImage="Blog Card"
+                    title={blog.blog_title}
+                    subTitle={blog.blog_subtitle}
+                    description={blog.blog_description}
+                    btnText="" 
+                    btnUrl={""}
+                    page="profile"
+                  />
                 </div>
               );
             })}
