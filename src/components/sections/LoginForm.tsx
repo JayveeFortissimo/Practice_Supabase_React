@@ -44,7 +44,7 @@ const LoginForm = () => {
       toast.error("Cannot Login! ");
       return;
     }
-     dispatch(setAccesToken(data.session?.access_token as string));
+     dispatch(setAccesToken({accessToken:data.session?.access_token as string, userId: data.session?.user.id as string}));
     router("/");
     reset();
   }
