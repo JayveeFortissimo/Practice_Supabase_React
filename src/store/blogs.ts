@@ -15,6 +15,12 @@ interface States {
     blog_subtitle: string;
     blog_description: string;
   };
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    page:number;
+    limit:number;
+  };
 }
 
 const initialState: States = {
@@ -28,6 +34,12 @@ const initialState: States = {
     blog_subtitle: "",
     blog_description: "",
   },
+  pagination: {
+    currentPage: 1,
+    totalPages: 6,
+    page:1,
+    limit:6
+  },
 };
 
 export const postBlogs = createAsyncThunk(
@@ -36,6 +48,13 @@ export const postBlogs = createAsyncThunk(
     const state = getState() as RootState;
     const { getInputsAdd } = state.createBlog;
     const userId = state.userAuthentication.user_id;
+    const { blog_title, blog_description, blog_subtitle } = getInputsAdd;
+
+    if (
+      (blog_title || blog_description || blog_subtitle) === "" ||
+      blogImage === null
+    )
+      return toast.error("Fields are required!");
 
     try {
       let publicImageUrl = "";
@@ -71,12 +90,14 @@ export const postBlogs = createAsyncThunk(
 
       toast.success("Blog Uploaded Successfully.");
 
-      dispatch(setInputs({
-        blog_image_preview: null,
-        blog_title: "",
-        blog_subtitle: "",
-        blog_description: "",
-      }));
+      dispatch(
+        setInputs({
+          blog_image_preview: null,
+          blog_title: "",
+          blog_subtitle: "",
+          blog_description: "",
+        })
+      );
 
       return true;
     } catch (err: any) {
@@ -88,9 +109,24 @@ export const postBlogs = createAsyncThunk(
 
 export const fetchBlogs = createAsyncThunk(
   "blogs/fetchBlogs",
-  async (_, { rejectWithValue }) => {
+  async (_, {getState, rejectWithValue }) => {
+    
+    const state = getState() as RootState;
+    const {pagination} = state.createBlog;
+
     try {
-      const { data, error } = await supabase.from("Blogs").select();
+      const ITEMS_PER_PAGE = pagination.limit;
+      const currentPage = pagination.currentPage;
+      
+      const from = (currentPage - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE - 1;
+      
+      const { data, error } = await supabase
+        .from("Blogs")
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false })
+        .range(from, to);
+          console.log("All Data: ", data)
 
       if (error) throw error;
       return data ?? [];
@@ -141,4 +177,5 @@ export const createBlog = createSlice({
 
 export default createBlog.reducer;
 
-export const { setOpenAddBlog, setOpenUpdateBlog, setInputs } = createBlog.actions;
+export const { setOpenAddBlog, setOpenUpdateBlog, setInputs } =
+  createBlog.actions;

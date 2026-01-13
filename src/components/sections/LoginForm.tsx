@@ -14,10 +14,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
-
 import supabase from "@/Supabase";
 import { toast } from "sonner";
-
 import { useDispatch } from "react-redux";
 import { setAccesToken } from "@/store/authentication";
 

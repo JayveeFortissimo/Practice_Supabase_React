@@ -1,3 +1,4 @@
+// import { useId } from 'react'
 import DialogItems from "@/components/common/DialogItems";
 import type { RootState } from "@/store/storeMain";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,10 +10,12 @@ import image from "@/assets/Image/Add.png";
 import BlogCards from "@/components/common/BlogCards";
 import { SkeletonCardGrid } from "@/components/common/SkeletonLoading";
 
+
 const Profile = () => {
   const dispatch = useDispatch();
-  const { openAddBlog, openUpdateBlog, blogs, isLoading } = useSelector(
-    (state: RootState) => state.createBlog
+  // const blogID = useId()
+
+  const { openAddBlog, openUpdateBlog, blogs, isLoading } = useSelector((state: RootState) => state.createBlog
   );
   const { user_id } = useSelector(
     (state: RootState) => state.userAuthentication
@@ -63,7 +66,7 @@ const Profile = () => {
               className="h-auto w-[12rem]"
             />
             <p className="text-2xl font-bold text-neutral-700">
-              No Blogs Created Yet!{" "}
+              No Blogs Created Yet!
             </p>
             <Button className="mt-5">Create Blogs</Button>
           </div>
@@ -90,6 +93,7 @@ const Profile = () => {
               })}
           </div>
         )}
+
       </section>
     </div>
   );

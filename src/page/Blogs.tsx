@@ -4,10 +4,16 @@ import { useEffect } from "react";
 import { fetchBlogs } from "@/store/blogs";
 import BlogCards from "@/components/common/BlogCards";
 import { SkeletonCardGrid } from "@/components/common/SkeletonLoading";
+import { useId } from "react";
+import PaginationWithPrimaryButton from "@/components/common/Pagination";
+import { Input } from "@/components/ui/input";
+import { HeroSection } from "@/components/sections/Hero";
+import Sax from "@/assets/Image/Sax.jpg"
 
 const Blogs = () => {
   const dispatch = useDispatch();
-  const { isLoading, blogs } = useSelector(
+  const blogID = useId();
+  const { isLoading, blogs, pagination } = useSelector(
     (state: RootState) => state.createBlog
   );
 
@@ -16,7 +22,23 @@ const Blogs = () => {
   }, [dispatch]);
 
   return (
-    <div className="min-h-screen container mx-auto p-2">
+    <div className="min-h-screen">
+     <header className="w-full">
+       <HeroSection
+        variant="outlined"
+        backgroundImage={Sax}
+        title={"HERE'S THE GREATEST MUSICIAN'S AROUND THE WORLD."}
+        description={
+          "These people are so humble and the skills is outstanding around the world."
+        }
+        className="min-h-[26.25rem]! mb-5 bg-[#111820]"
+      />
+     </header>
+      
+      <main className="container mx-auto px-5 md:px-0">
+        <section className="mb-10">
+        <Input type="text" placeholder="search ..." />
+      </section>
       {isLoading ? (
         <SkeletonCardGrid count={6} />
       ) : blogs.length === 0 ? (
@@ -27,22 +49,37 @@ const Blogs = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {blogs.map((blog) => {
             return (
-               <div    key={blog.blog_id}>
-               <BlogCards 
-                image={blog.blog_img}
-                altImage="Blog Card"
-                title={blog.blog_title}
-                subTitle={blog.blog_subtitle}
-                description={blog.blog_description}
-                btnText="Read More"
-                btnUrl={`/blogs/${blog.blog_id}`}
-                page={"default"}
-               />
-               </div>
+              <div key={blog.blog_id}>
+                <BlogCards
+                  image={blog.blog_img}
+                  altImage="Blog Card"
+                  title={blog.blog_title}
+                  subTitle={blog.blog_subtitle}
+                  description={blog.blog_description}
+                  btnText="Read More"
+                  btnUrl={`/blogs/${blog.blog_id}`}
+                  page={"default"}
+                />
+              </div>
             );
           })}
         </div>
       )}
+
+      <div className="col-span-full w-full mt-5">
+        <PaginationWithPrimaryButton
+          currentPage={pagination.currentPage}
+          totalPages={pagination.page || 1}
+          onPageChange={(page) =>
+            dispatch({
+              type: "PAGINATION",
+              payload: { ...pagination, page },
+            })
+          }
+          id={blogID as string}
+        />
+      </div>
+      </main>
     </div>
   );
 };

@@ -16,7 +16,7 @@ const Home = ({
 }) => {
   const router = useNavigate();
   return (
-    <div className="min-h-[80vh] p-2 flex justify-center items-center">
+    <div className="min-h-[70vh] p-2 flex justify-center items-center">
       <div className="flex flex-col justify-center items-center">
         <BadgeGradientOutlineDemo text={"Music is Life 🎼🎶"} />
         <h1 className="text-3xl md:text-6xl font-bold text-center mb-4 tracking-tighter md:leading-[1.2] text-neutral-800">
