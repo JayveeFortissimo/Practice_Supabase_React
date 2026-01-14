@@ -21,9 +21,12 @@ export const userAuthentication = createSlice({
       state.access_token = action.payload.accessToken;
       state.user_id = action.payload.userId;
     },
+    setLoading: (state, action:PayloadAction<boolean>) =>{
+     state.isLoading = action.payload;
+    } 
   },
 });
 
 export default userAuthentication.reducer;
 
-export const { setAccesToken } = userAuthentication.actions;
+export const { setAccesToken, setLoading } = userAuthentication.actions;

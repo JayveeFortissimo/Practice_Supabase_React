@@ -12,7 +12,7 @@ const Homepage = () => {
         <HeroSection
           variant="outlined"
           backgroundImage={image}
-          title={"🎧 Where Music Meets Meaning, Life Is Changing"}
+          title={"🎧 MUSIC IS LIFE"}
           description={
             "Discover stories behind the sounds, explore new artists, and dive into the rhythm of every genre. From hidden indie gems to legendary tracks, this is where every beat has a story worth hearing."
           }

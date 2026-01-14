@@ -1,5 +1,4 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-
 import Outlets from "@/Outlets";
 import Homepage from "@/page/HomePage";
 import AboutPage from "@/page/AboutPage";
@@ -8,6 +7,7 @@ import Login from "@/page/auth/Login";
 import Register from "@/page/auth/Register";
 import Profile from "@/page/Profile";
 import ViewMore from "@/page/ViewMore";
+import RequiredAuth from "./RequiredAuth";
 
 function App() {
   const routes = createBrowserRouter([
@@ -41,7 +41,13 @@ function App() {
         },
         {
           path: "profile",
-          element: <Profile />,
+          element: <RequiredAuth />,
+          children: [
+            {
+              index: true,
+              element: <Profile />,
+            },
+          ],
         },
       ],
     },
