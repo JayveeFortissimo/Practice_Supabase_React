@@ -13,8 +13,9 @@ const BlogCards = ({
   description,
   dispatch,
   setOpenUpdateBlog,
+  setOpenDeleteBlog
 }: {
-  id?: string | undefined;
+  id?: number | undefined;
   page: "default" | "profile";
   image: string;
   title: string;
@@ -25,6 +26,7 @@ const BlogCards = ({
   description: string;
   dispatch?: any;
   setOpenUpdateBlog?: any;
+  setOpenDeleteBlog?: any;
 }) => {
   const navigate = useNavigate();
 
@@ -55,7 +57,7 @@ const BlogCards = ({
               onClick={() => {
                 dispatch(
                   setBlogId({
-                    blog_Id: id as string,
+                    blog_Id: id as number,
                     getInputs: {
                       blog_image_preview: image,
                       blog_title: title,
@@ -70,7 +72,23 @@ const BlogCards = ({
             >
               Edit
             </Button>
-            <Button className="bg-[#BD3144]">Delete</Button>
+            <Button 
+            className="bg-[#BD3144]"
+            onClick={() => {
+                dispatch(
+                  setBlogId({
+                    blog_Id: id as number,
+                    getInputs: {
+                      blog_image_preview:"",
+                      blog_title: "",
+                      blog_subtitle:"",
+                      blog_description:"",
+                    },
+                  })
+                );
+              dispatch(setOpenDeleteBlog(true))
+            }}
+            >Delete</Button>
           </div>
         ) : (
           <Button className="mt-6" onClick={() => navigate(btnUrl)}>

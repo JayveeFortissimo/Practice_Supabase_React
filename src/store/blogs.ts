@@ -3,12 +3,26 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "./storeMain";
 import { toast } from "sonner";
 import supabase from "@/Supabase";
+interface Blog {
+  blog_id: number;
+  blog_img: string;
+  blog_title: string;
+  blog_subtitle: string;
+  blog_description: string;
+  user_id: string;
+  created_at: string;
+}
 
 interface States {
-  blogs: any[];
+  blogs: Blog[];
   isLoading: boolean;
+  isLoadingCreate: boolean;
+  isLoadingUpdate: boolean;
+  isLoadingDelete: boolean;
+
   openAddBlog: boolean;
   openUpdateBlog: boolean;
+  openDeleteBlog: boolean;
   getInputs: {
     blog_image_preview: string | null;
     blog_title: string;
@@ -27,8 +41,13 @@ interface States {
 const initialState: States = {
   blogs: [],
   isLoading: false,
+  isLoadingCreate: false,
+  isLoadingUpdate: false,
+  isLoadingDelete: false,
+
   openAddBlog: false,
   openUpdateBlog: false,
+  openDeleteBlog: false,
   getInputs: {
     blog_image_preview: null,
     blog_title: "",
@@ -46,19 +65,14 @@ const initialState: States = {
 
 export const postBlogs = createAsyncThunk(
   "post/blogs",
-  async (blogImage: File | null, { getState, rejectWithValue, dispatch }) => {
+  async (blogImage: File | null, { getState }) => {
     const state = getState() as RootState;
     const { getInputs } = state.createBlog;
     const userId = state.userAuthentication.user_id;
     const { blog_title, blog_description, blog_subtitle } = getInputs;
 
-    if (
-      (blog_title || blog_description || blog_subtitle) === "" ||
-      blogImage === null
-    )
-      return toast.error("Fields are required!");
+    if ((blog_title || blog_description || blog_subtitle) === "" || blogImage === null) return toast.error("Fields are required!");
 
-    try {
       let publicImageUrl = "";
 
       if (blogImage) {
@@ -80,7 +94,7 @@ export const postBlogs = createAsyncThunk(
         publicImageUrl = urlData.publicUrl;
       }
 
-      const { error: dbError } = await supabase.from("Blogs").insert({
+        await supabase.from("Blogs").insert({
         blog_img: publicImageUrl,
         blog_title: getInputs.blog_title,
         blog_subtitle: getInputs.blog_subtitle,
@@ -88,34 +102,23 @@ export const postBlogs = createAsyncThunk(
         user_id: userId,
       });
 
-      if (dbError) throw dbError;
-
-      toast.success("Blog Uploaded Successfully.");
-
-      dispatch(
-        setInputs({
-          blog_image_preview: null,
-          blog_title: "",
-          blog_subtitle: "",
-          blog_description: "",
-        })
-      );
-
-      return true;
-    } catch (err: any) {
-      toast.error(err.message || "Failed to upload blog.");
-      return rejectWithValue(err.message);
-    }
+      return {
+         blog_img: publicImageUrl,
+        blog_title: getInputs.blog_title,
+        blog_subtitle: getInputs.blog_subtitle,
+        blog_description: getInputs.blog_description,
+        user_id: userId,
+      };
+    
   }
 );
 
 export const fetchBlogs = createAsyncThunk(
   "blogs/fetchBlogs",
-  async (_, { getState, rejectWithValue }) => {
+  async (_, { getState }) => {
     const state = getState() as RootState;
     const { pagination } = state.createBlog;
 
-    try {
       const ITEMS_PER_PAGE = pagination.limit;
       const currentPage = pagination.currentPage;
 
@@ -134,38 +137,39 @@ export const fetchBlogs = createAsyncThunk(
         data: data ?? [],
         total: count ?? 0,
       };
-    } catch (err: any) {
-      return rejectWithValue(err.message);
-    }
-  }
+    } 
 );
 
 export const updateBlogs = createAsyncThunk(
   "update/updateBlogs",
-  async ({id , updatedData}:{id: string, updatedData: any}, { getState }) => {
+  async (
+    { id, updatedData }: { id: string; updatedData?: any },
+    { getState }
+  ) => {
     const state = getState() as RootState;
     const userId = state.userAuthentication.user_id;
- 
-    const { data, error } = await supabase
+
+    const { data } = await supabase
       .from("Blogs")
       .update({
         blog_title: updatedData.blog_title,
         blog_subtitle: updatedData.blog_subtitle,
         blog_description: updatedData.blog_description,
         blog_img: updatedData.blog_image_preview,
-        user_id:userId
+        user_id: userId,
       })
       .eq("blog_id", Number(id))
       .select();
-       
-       console.log("Updating blog with ID:", id);
-    console.log("Update Data:", updatedData);
-    if (error) {
-      console.error("Error updating Blogs:", error.message);
-    } else {
-      console.log("Blog updated successfully:", data);
-      return data;
-    }
+
+    return { data, updatedData, blogId: id };
+  }
+);
+
+export const deleteBlogs = createAsyncThunk(
+  "delete/deleteBlogs",
+  async (blog_id: string) => {
+    await supabase.from("Blogs").delete().eq("blog_id", Number(blog_id));
+    return blog_id;
   }
 );
 
@@ -178,6 +182,9 @@ export const createBlog = createSlice({
     },
     setOpenUpdateBlog: (state, action: PayloadAction<boolean>) => {
       state.openUpdateBlog = action.payload;
+    },
+    setOpenDeleteBlog: (state, action: PayloadAction<boolean>) => {
+      state.openDeleteBlog = action.payload;
     },
     setInputs: (state, action: PayloadAction<Partial<States["getInputs"]>>) => {
       state.getInputs = {
@@ -194,7 +201,10 @@ export const createBlog = createSlice({
         ...action.payload,
       };
     },
-    setBlogId: (state: any, actions: PayloadAction<{blog_Id:string, getInputs:any}>) => {
+    setBlogId: (
+      state: any,
+      actions: PayloadAction<{ blog_Id: number; getInputs: any }>
+    ) => {
       state.blog_Id = actions.payload.blog_Id;
       state.getInputs = actions.payload.getInputs;
     },
@@ -213,11 +223,82 @@ export const createBlog = createSlice({
           state.pagination.totalPages = Math.ceil(
             action.payload.total / state.pagination.limit
           );
+          state.isLoadingCreate = false;
         }
       )
       .addCase(fetchBlogs.rejected, (state: any) => {
         state.isLoading = false;
-      });
+        toast.error("Failed to fetch blogs please try again.");
+      })
+
+      .addCase(updateBlogs.pending, (state: any) => {
+        state.isLoadingUpdate = true;
+      })
+      .addCase(updateBlogs.rejected, (state: any) => {
+        state.isLoadingUpdate = false;
+        toast.error("Failed to update blog.");
+      })
+      .addCase(
+        updateBlogs.fulfilled,
+        (
+          state: any,
+          action: PayloadAction<{ data: any; updatedData: any; blogId: string }>
+        ) => {
+          state.isLoadingUpdate = false;
+          state.openUpdateBlog = false;
+          state.blogs = state.blogs.map((blog: any) => {
+            if (blog.blog_id === Number(action.payload.blogId)) {
+              return {
+                ...blog,
+                blog_title: action.payload.updatedData.blog_title,
+                blog_subtitle: action.payload.updatedData.blog_subtitle,
+                blog_description: action.payload.updatedData.blog_description,
+                blog_img: action.payload.updatedData.blog_image_preview,
+              };
+            }
+            return blog;
+          });
+          toast.success("Blog Updated Successfully.");
+        }
+      )
+
+      .addCase(postBlogs.pending, (state: any) => {
+        state.isLoadingCreate = true;
+      })
+      .addCase(postBlogs.rejected, (state: any) => {
+        state.isLoadingCreate = false;
+      })
+      .addCase(postBlogs.fulfilled, (state: any, action: PayloadAction<any>) => {
+        state.isLoadingCreate = false;
+        state.blogs.unshift(action.payload);
+        state.getInputs = {
+          blog_image_preview: null,
+          blog_title: "",
+          blog_subtitle: "",
+          blog_description: "",
+        }
+        state.openAddBlog = false;
+        toast.success("Blog Uploaded Successfully.");
+      })
+
+      .addCase(deleteBlogs.pending, (state: any) => {
+        state.isLoadingDelete = true;
+      })
+      .addCase(deleteBlogs.rejected, (state: any) => {
+        state.isLoadingDelete = false;
+        toast.error("Failed to delete blog.");
+      })
+      .addCase(
+        deleteBlogs.fulfilled,
+        (state: any, action: PayloadAction<string>) => {
+          state.isLoadingDelete = false;
+          state.openDeleteBlog = false;
+          state.blogs = state.blogs.filter(
+            (blog: any) => blog.blog_id !== Number(action.payload)
+          );
+          toast.success("Blog Deleted Successfully.");
+        }
+      );
   },
 });
 
@@ -229,4 +310,5 @@ export const {
   setInputs,
   setPagination,
   setBlogId,
+  setOpenDeleteBlog,
 } = createBlog.actions;

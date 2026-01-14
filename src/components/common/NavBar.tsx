@@ -42,8 +42,6 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/store/storeMain";
 import { setAccesToken } from "@/store/authentication";
 import { useDispatch } from "react-redux";
-import { setOpenAddBlog } from "@/store/blogs";
-import { useLocation } from "react-router-dom";
 import supabase from "@/Supabase";
 interface MenuItem {
   title: string;
@@ -99,8 +97,7 @@ const Navbar = ({
   },
   className,
 }: Navbar1Props) => {
-  const addNotallowed = ["/login", "/register", "/", "/about", "/blogs"];
-  const params = useLocation();
+ 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const accessToken = useSelector(
@@ -175,15 +172,6 @@ const Navbar = ({
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-
-              {addNotallowed.includes(params.pathname) ? undefined : (
-                <div className="flex items-center gap-5">
-                  <NotebookPen
-                    className="cursor-pointer"
-                    onClick={() => dispatch(setOpenAddBlog(true))}
-                  />
-                </div>
-              )}
             </div>
           )}
         </nav>
