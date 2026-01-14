@@ -13,11 +13,19 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
 import supabase from "@/Supabase";
+import { toast } from "sonner";
+import SpinnerCircle2 from "../common/Loading";
+import { useDispatch, useSelector } from "react-redux";
+import type { RootState } from "@/store/storeMain";
+import { setLoading } from "@/store/authentication";
 
 const RegisterForm = () => {
   const router = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoading } = useSelector(
+    (state: RootState) => state.userAuthentication
+  );
 
   const form = useForm<z.infer<typeof registerFormSchema>>({
     resolver: zodResolver(registerFormSchema),
@@ -32,24 +40,27 @@ const RegisterForm = () => {
   const { handleSubmit, reset } = form;
 
   async function onSubmit(values: z.infer<typeof registerFormSchema>) {
-    const { data, error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-      options: {
-        data: {
-          username: values.username,
+    if (values.password !== values.confirmPassword)
+      return toast.error("Password and confirm password does not match");
+    dispatch(setLoading(true));
+    try {
+      await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        options: {
+          data: {
+            username: values.username,
+          },
         },
-      },
-    });
+      });
 
-    if (error) {
-      console.log(error);
-      return;
+      router("/login");
+      reset();
+    } catch (error) {
+      dispatch(setLoading(true));
+    } finally {
+      dispatch(setLoading(false));
     }
-
-    router("/login");
-    reset();
-    console.log("Hello", data);
   }
 
   return (
@@ -65,6 +76,7 @@ const RegisterForm = () => {
             <FormField
               control={form.control}
               name="email"
+              disabled={isLoading}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-base lg:text-lg text-white">
@@ -85,6 +97,7 @@ const RegisterForm = () => {
             <FormField
               control={form.control}
               name="username"
+              disabled={isLoading}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-base lg:text-lg text-white">
@@ -105,6 +118,7 @@ const RegisterForm = () => {
             <FormField
               control={form.control}
               name="password"
+              disabled={isLoading}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-base lg:text-lg text-white">
@@ -125,6 +139,7 @@ const RegisterForm = () => {
             <FormField
               control={form.control}
               name="confirmPassword"
+              disabled={isLoading}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-base lg:text-lg text-white">
@@ -143,8 +158,13 @@ const RegisterForm = () => {
             />
 
             <div className="w-full">
-              <Button variant={"default"} type="submit" className="w-full">
-                Sign up
+              <Button
+                variant={"default"}
+                disabled={isLoading}
+                type="submit"
+                className="w-full"
+              >
+                {isLoading ? <SpinnerCircle2 /> : "Sign up"}
               </Button>
             </div>
           </form>

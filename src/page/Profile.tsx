@@ -43,6 +43,7 @@ const Profile = () => {
     }
   };
 
+
   return (
     <div className="flex flex-col gap-20 min-h-screen px-3 items-center">
       <DialogItems
@@ -68,7 +69,7 @@ const Profile = () => {
       <section className="border min-h-[30rem] w-full p-3 container mx-auto">
         {isLoading ? (
           <SkeletonCardGrid count={6} />
-        ) : blogs.length === 0 ? (
+        ) : myBlogs?.length === 0 ? (
           <div className="border min-h-[30rem] w-full p-3 flex flex-col gap-2 justify-center items-center">
             <img
               src={image}
@@ -78,7 +79,7 @@ const Profile = () => {
             <p className="text-2xl font-bold text-neutral-700">
               No Blogs Created Yet!
             </p>
-            <Button className="mt-5">Create Blogs</Button>
+            <p className="mt-5">Please click the create button 😊</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -106,7 +107,9 @@ const Profile = () => {
           </div>
         )}
 
-        <div className="col-span-full w-full mt-5">
+       {
+        myBlogs?.length >0 && (
+           <div className="col-span-full w-full mt-5">
           <PaginationWithPrimaryButton
             currentPage={pagination.currentPage}
             totalPages={pagination.totalPages}
@@ -116,6 +119,8 @@ const Profile = () => {
             id={blogID as string}
           />
         </div>
+        )
+       }
       </section>
     </div>
   );

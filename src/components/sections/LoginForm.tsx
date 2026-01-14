@@ -16,12 +16,18 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import supabase from "@/Supabase";
 import { toast } from "sonner";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAccesToken } from "@/store/authentication";
+import type { RootState } from "@/store/storeMain";
+import { setLoading } from "@/store/authentication";
+import SpinnerCircle2 from "../common/Loading";
 
 const LoginForm = () => {
   const router = useNavigate();
   const dispatch = useDispatch();
+  const { isLoading } = useSelector(
+    (state: RootState) => state.userAuthentication
+  );
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
@@ -34,17 +40,31 @@ const LoginForm = () => {
   const { handleSubmit, reset } = form;
 
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
+    try {
+      dispatch(setLoading(true));
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: values.email,
+        password: values.password,
+      });
 
-    const {data, error} = await supabase.auth.signInWithPassword({email:values.email,password:values.password});
-     
-    if (error) {
-      console.log(error);
-      toast.error("Cannot Login! ");
-      return;
+      if (error) {
+        console.log(error);
+        toast.error("Cannot Login! ");
+        return;
+      }
+      dispatch(
+        setAccesToken({
+          accessToken: data.session?.access_token as string,
+          userId: data.session?.user.id as string,
+        })
+      );
+      router("/");
+      reset();
+    } catch (error) {
+      dispatch(setLoading(false));
+    } finally {
+      dispatch(setLoading(false));
     }
-     dispatch(setAccesToken({accessToken:data.session?.access_token as string, userId: data.session?.user.id as string}));
-    router("/");
-    reset();
   }
 
   return (
@@ -67,7 +87,7 @@ const LoginForm = () => {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      //   disabled={isLoading}
+                      disabled={isLoading}
                       placeholder="JohnDoe@gmail.com"
                       {...field}
                       className="bg-white"
@@ -81,6 +101,7 @@ const LoginForm = () => {
             <FormField
               control={form.control}
               name="password"
+              disabled={isLoading}
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className="text-base lg:text-lg text-white">
@@ -88,7 +109,6 @@ const LoginForm = () => {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      //   disabled={isLoading}
                       placeholder="********"
                       {...field}
                       className="bg-white"
@@ -121,15 +141,23 @@ const LoginForm = () => {
               )}
             />
             <div className="w-full">
-              <Button variant={"default"} type="submit" className="w-full">
-                {/* {isLoading ? <SpinnerCircle /> : "Sign in"} */} Sign in
+              <Button
+                variant={"default"}
+                disabled={isLoading}
+                type="submit"
+                className="w-full"
+              >
+                {isLoading ? <SpinnerCircle2 /> : "Sign in"}
               </Button>
             </div>
           </form>
         </Form>
 
         <div className="w-full border" />
-        <p onClick={() => router('/register')} className="text-center text-white cursor-pointer hover:underline text-sm">
+        <p
+          onClick={() => router("/register")}
+          className="text-center text-white cursor-pointer hover:underline text-sm"
+        >
           Don't have account yet?
         </p>
       </div>

@@ -9,7 +9,7 @@ interface States {
 
 const initialState: States = {
   access_token: "",
-  isLoading: true,
+  isLoading: false,
   user_id:""
 };
 
