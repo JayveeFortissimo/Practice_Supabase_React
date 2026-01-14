@@ -1,9 +1,7 @@
 "use client";
 
 import { Menu } from "lucide-react";
-
 import { cn } from "@/lib/utils";
-import { NotebookPen } from "lucide-react";
 
 import {
   Accordion,
