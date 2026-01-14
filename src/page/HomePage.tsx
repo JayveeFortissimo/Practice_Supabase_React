@@ -3,9 +3,12 @@ import SectionHome from "@/components/sections/SectionHome";
 import { HeroSection } from "@/components/sections/Hero";
 import image from "@/assets/Image/Maestro2.png";
 import { useNavigate } from "react-router-dom";
+import Violin from "@/assets/Image/Violin.jpg";
 
 const Homepage = () => {
+  
   const router = useNavigate();
+
   return (
     <>
       <header className="w-full mb-20">
@@ -36,6 +39,20 @@ const Homepage = () => {
         btnText={"Explore More"}
         btnUrl={"/blogs"}
       />
+
+      <header className="w-full mt-5">
+        <HeroSection
+          variant="outlined"
+          backgroundImage={Violin}
+          title={"CREATE AND POST A BLOG NOW"}
+          description={
+            "We encourage all of the musicians around the world that use this platform to motivate young musicians"
+          }
+          className="min-h-[26.25rem]! mb-5 bg-[#111820]"
+          button={"Create Account Now!"}
+          onClick={() => router("/register")}
+        />
+      </header>
     </>
   );
 };

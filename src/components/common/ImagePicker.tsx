@@ -32,7 +32,7 @@ interface InputDemoProps {
 
 export default function InputDemo({ dispatch, onFileSelect }: InputDemoProps) {
   const blogImagePreview = useSelector(
-    (state: RootState) => state.createBlog.getInputsAdd.blog_image_preview
+    (state: RootState) => state.createBlog.getInputs.blog_image_preview
   );
 
   const handleRemove = () => {

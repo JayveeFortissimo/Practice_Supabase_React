@@ -1,6 +1,8 @@
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
+import { setBlogId } from "@/store/blogs";
 const BlogCards = ({
+  id,
   page,
   image,
   title,
@@ -12,6 +14,7 @@ const BlogCards = ({
   dispatch,
   setOpenUpdateBlog,
 }: {
+  id?: string | undefined;
   page: "default" | "profile";
   image: string;
   title: string;
@@ -24,6 +27,7 @@ const BlogCards = ({
   setOpenUpdateBlog?: any;
 }) => {
   const navigate = useNavigate();
+
   return (
     <div className="border rounded-lg overflow-hidden mb-4">
       {image ? (
@@ -47,7 +51,23 @@ const BlogCards = ({
 
         {page === "profile" ? (
           <div className="mt-6 flex gap-2">
-            <Button onClick={() => dispatch(setOpenUpdateBlog(true))}>
+            <Button
+              onClick={() => {
+                dispatch(
+                  setBlogId({
+                    blog_Id: id as string,
+                    getInputs: {
+                      blog_image_preview: image,
+                      blog_title: title,
+                      blog_subtitle: subTitle,
+                      blog_description: description,
+                    },
+                  })
+                );
+
+                dispatch(setOpenUpdateBlog(true));
+              }}
+            >
               Edit
             </Button>
             <Button className="bg-[#BD3144]">Delete</Button>

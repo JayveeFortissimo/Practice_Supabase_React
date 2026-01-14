@@ -9,13 +9,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Notebook } from "lucide-react";
+import { Notebook, Pen } from "lucide-react";
 import InputDemo from "./ImagePicker";
 import { useDispatch, useSelector } from "react-redux";
 import { setInputs } from "@/store/blogs";
 import { postBlogs } from "@/store/blogs";
 import type { RootState } from "@/store/storeMain";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { updateBlogs } from "@/store/blogs";
 
 interface DialogItemsProps {
   types?: "Create" | "Update";
@@ -25,8 +26,12 @@ interface DialogItemsProps {
 
 const DialogItems = ({ types, open, onOpenChange }: DialogItemsProps) => {
   const dispatch = useDispatch();
-  const {getInputsAdd} = useSelector((state: RootState) => state.createBlog);
+  const {getInputs, blog_Id} = useSelector((state: RootState) => state.createBlog);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
+  useEffect(() => {
+      if(!open) dispatch(setInputs({ blog_image_preview: "", blog_title: "", blog_subtitle: "", blog_description: "" }));
+  },[open, dispatch]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -50,7 +55,7 @@ const DialogItems = ({ types, open, onOpenChange }: DialogItemsProps) => {
               <Input
                 type="text"
                 placeholder="Title ..."
-                value={getInputsAdd.blog_title}
+                value={getInputs.blog_title}
                 onChange={(e) =>
                   dispatch(setInputs({ blog_title: e.target.value }))
                 }
@@ -62,7 +67,7 @@ const DialogItems = ({ types, open, onOpenChange }: DialogItemsProps) => {
               <Input
                 type="text"
                 placeholder="Subtitle ..."
-                value={getInputsAdd.blog_subtitle}
+                value={getInputs.blog_subtitle}
                 onChange={(e) =>
                   dispatch(setInputs({ blog_subtitle: e.target.value }))
                 }
@@ -73,7 +78,7 @@ const DialogItems = ({ types, open, onOpenChange }: DialogItemsProps) => {
               <Label htmlFor="description">Description</Label>
               <textarea
                 className="border p-2"
-                value={getInputsAdd.blog_description}
+                value={getInputs.blog_description}
                 onChange={(e) =>
                   dispatch(setInputs({ blog_description: e.target.value }))
                 }
@@ -88,6 +93,8 @@ const DialogItems = ({ types, open, onOpenChange }: DialogItemsProps) => {
             onClick={() => {
               if (types === "Create") {
                 dispatch(postBlogs(selectedFile) as any);
+              }else if(types === "Update"){
+                dispatch(updateBlogs({ id: blog_Id, updatedData: getInputs }) as any);
               }
             }}
           >
@@ -96,7 +103,9 @@ const DialogItems = ({ types, open, onOpenChange }: DialogItemsProps) => {
                 <Notebook /> Create
               </div>
             ) : (
-              "Update"
+              <div className="flex items-center gap-2">
+                <Pen /> Edit
+              </div>
             )}
           </Button>
         </DialogFooter>

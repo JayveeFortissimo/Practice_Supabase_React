@@ -9,7 +9,7 @@ interface States {
   isLoading: boolean;
   openAddBlog: boolean;
   openUpdateBlog: boolean;
-  getInputsAdd: {
+  getInputs: {
     blog_image_preview: string | null;
     blog_title: string;
     blog_subtitle: string;
@@ -18,9 +18,10 @@ interface States {
   pagination: {
     currentPage: number;
     totalPages: number;
-    page:number;
-    limit:number;
+    page: number;
+    limit: number;
   };
+  blog_Id: string;
 }
 
 const initialState: States = {
@@ -28,7 +29,7 @@ const initialState: States = {
   isLoading: false,
   openAddBlog: false,
   openUpdateBlog: false,
-  getInputsAdd: {
+  getInputs: {
     blog_image_preview: null,
     blog_title: "",
     blog_subtitle: "",
@@ -36,19 +37,20 @@ const initialState: States = {
   },
   pagination: {
     currentPage: 1,
-    totalPages: 6,
-    page:1,
-    limit:6
+    totalPages: 0,
+    page: 1,
+    limit: 6,
   },
+  blog_Id: "",
 };
 
 export const postBlogs = createAsyncThunk(
   "post/blogs",
   async (blogImage: File | null, { getState, rejectWithValue, dispatch }) => {
     const state = getState() as RootState;
-    const { getInputsAdd } = state.createBlog;
+    const { getInputs } = state.createBlog;
     const userId = state.userAuthentication.user_id;
-    const { blog_title, blog_description, blog_subtitle } = getInputsAdd;
+    const { blog_title, blog_description, blog_subtitle } = getInputs;
 
     if (
       (blog_title || blog_description || blog_subtitle) === "" ||
@@ -80,9 +82,9 @@ export const postBlogs = createAsyncThunk(
 
       const { error: dbError } = await supabase.from("Blogs").insert({
         blog_img: publicImageUrl,
-        blog_title: getInputsAdd.blog_title,
-        blog_subtitle: getInputsAdd.blog_subtitle,
-        blog_description: getInputsAdd.blog_description,
+        blog_title: getInputs.blog_title,
+        blog_subtitle: getInputs.blog_subtitle,
+        blog_description: getInputs.blog_description,
         user_id: userId,
       });
 
@@ -109,29 +111,60 @@ export const postBlogs = createAsyncThunk(
 
 export const fetchBlogs = createAsyncThunk(
   "blogs/fetchBlogs",
-  async (_, {getState, rejectWithValue }) => {
-    
+  async (_, { getState, rejectWithValue }) => {
     const state = getState() as RootState;
-    const {pagination} = state.createBlog;
+    const { pagination } = state.createBlog;
 
     try {
       const ITEMS_PER_PAGE = pagination.limit;
       const currentPage = pagination.currentPage;
-      
+
       const from = (currentPage - 1) * ITEMS_PER_PAGE;
       const to = from + ITEMS_PER_PAGE - 1;
-      
-      const { data, error } = await supabase
+
+      const { data, error, count } = await supabase
         .from("Blogs")
         .select("*", { count: "exact" })
         .order("created_at", { ascending: false })
         .range(from, to);
-          console.log("All Data: ", data)
 
       if (error) throw error;
-      return data ?? [];
+
+      return {
+        data: data ?? [],
+        total: count ?? 0,
+      };
     } catch (err: any) {
       return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const updateBlogs = createAsyncThunk(
+  "update/updateBlogs",
+  async ({id , updatedData}:{id: string, updatedData: any}, { getState }) => {
+    const state = getState() as RootState;
+    const userId = state.userAuthentication.user_id;
+ 
+    const { data, error } = await supabase
+      .from("Blogs")
+      .update({
+        blog_title: updatedData.blog_title,
+        blog_subtitle: updatedData.blog_subtitle,
+        blog_description: updatedData.blog_description,
+        blog_img: updatedData.blog_image_preview,
+        user_id:userId
+      })
+      .eq("blog_id", Number(id))
+      .select();
+       
+       console.log("Updating blog with ID:", id);
+    console.log("Update Data:", updatedData);
+    if (error) {
+      console.error("Error updating Blogs:", error.message);
+    } else {
+      console.log("Blog updated successfully:", data);
+      return data;
     }
   }
 );
@@ -146,14 +179,24 @@ export const createBlog = createSlice({
     setOpenUpdateBlog: (state, action: PayloadAction<boolean>) => {
       state.openUpdateBlog = action.payload;
     },
-    setInputs: (
-      state,
-      action: PayloadAction<Partial<States["getInputsAdd"]>>
-    ) => {
-      state.getInputsAdd = {
-        ...state.getInputsAdd,
+    setInputs: (state, action: PayloadAction<Partial<States["getInputs"]>>) => {
+      state.getInputs = {
+        ...state.getInputs,
         ...action.payload,
       };
+    },
+    setPagination: (
+      state,
+      action: PayloadAction<Partial<States["pagination"]>>
+    ) => {
+      state.pagination = {
+        ...state.pagination,
+        ...action.payload,
+      };
+    },
+    setBlogId: (state: any, actions: PayloadAction<{blog_Id:string, getInputs:any}>) => {
+      state.blog_Id = actions.payload.blog_Id;
+      state.getInputs = actions.payload.getInputs;
     },
   },
 
@@ -164,9 +207,12 @@ export const createBlog = createSlice({
       })
       .addCase(
         fetchBlogs.fulfilled,
-        (state: any, action: PayloadAction<any[]>) => {
+        (state: any, action: PayloadAction<{ data: any[]; total: number }>) => {
           state.isLoading = false;
-          state.blogs = action.payload;
+          state.blogs = action.payload.data;
+          state.pagination.totalPages = Math.ceil(
+            action.payload.total / state.pagination.limit
+          );
         }
       )
       .addCase(fetchBlogs.rejected, (state: any) => {
@@ -177,5 +223,10 @@ export const createBlog = createSlice({
 
 export default createBlog.reducer;
 
-export const { setOpenAddBlog, setOpenUpdateBlog, setInputs } =
-  createBlog.actions;
+export const {
+  setOpenAddBlog,
+  setOpenUpdateBlog,
+  setInputs,
+  setPagination,
+  setBlogId,
+} = createBlog.actions;

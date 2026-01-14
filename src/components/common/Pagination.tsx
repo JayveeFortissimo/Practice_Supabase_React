@@ -23,7 +23,7 @@ export default function PaginationWithPrimaryButton({
   id,
 }: PaginationProps) {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1)
-
+    
   return (
     <Pagination className='w-full'>
       <PaginationContent className='flex justify-between items-center w-full'>
@@ -33,9 +33,7 @@ export default function PaginationWithPrimaryButton({
             onClick={(e) => {
               e.preventDefault()
               if (currentPage > 1) onPageChange(currentPage - 1)
-              document
-                .getElementById(`${id}`)
-                ?.scrollIntoView({ behavior: 'smooth' })
+              document.getElementById(`${id}`)?.scrollIntoView({ behavior: 'smooth' })
             }}
             className={cn(
               currentPage === 1 && 'pointer-events-none opacity-50',
@@ -51,12 +49,9 @@ export default function PaginationWithPrimaryButton({
                 onClick={(e) => {
                   e.preventDefault()
                   onPageChange(page)
-                  document
-                    .getElementById(`${id}`)
-                    ?.scrollIntoView({ behavior: 'smooth' })
+                  document.getElementById(`${id}`)?.scrollIntoView({ behavior: 'smooth' })
                 }}
-                className={cn(
-                  page === currentPage &&
+                className={cn(page === currentPage &&
                     buttonVariants({
                       variant: 'outline',
                       size: 'icon',

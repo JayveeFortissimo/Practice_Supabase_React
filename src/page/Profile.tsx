@@ -1,4 +1,4 @@
-// import { useId } from 'react'
+import { useId } from "react";
 import DialogItems from "@/components/common/DialogItems";
 import type { RootState } from "@/store/storeMain";
 import { useSelector, useDispatch } from "react-redux";
@@ -9,13 +9,15 @@ import { useEffect } from "react";
 import image from "@/assets/Image/Add.png";
 import BlogCards from "@/components/common/BlogCards";
 import { SkeletonCardGrid } from "@/components/common/SkeletonLoading";
-
+import PaginationWithPrimaryButton from "@/components/common/Pagination";
+import { setPagination } from "@/store/blogs";
 
 const Profile = () => {
   const dispatch = useDispatch();
-  // const blogID = useId()
+  const blogID = useId();
 
-  const { openAddBlog, openUpdateBlog, blogs, isLoading } = useSelector((state: RootState) => state.createBlog
+  const { openAddBlog, openUpdateBlog, blogs, isLoading, pagination } = useSelector(
+    (state: RootState) => state.createBlog
   );
   const { user_id } = useSelector(
     (state: RootState) => state.userAuthentication
@@ -23,7 +25,7 @@ const Profile = () => {
 
   useEffect(() => {
     dispatch(fetchBlogs() as any);
-  }, [dispatch, user_id]);
+  }, [dispatch, user_id, pagination.currentPage]);
 
   const isDialogOpen = openAddBlog || openUpdateBlog;
   const dialogType = openAddBlog ? "Create" : "Update";
@@ -77,6 +79,7 @@ const Profile = () => {
                 return (
                   <div key={blog?.blog_id}>
                     <BlogCards
+                      id={blog?.blog_id}
                       image={blog?.blog_img}
                       altImage="Blog Card"
                       title={blog?.blog_title}
@@ -94,6 +97,16 @@ const Profile = () => {
           </div>
         )}
 
+        <div className="col-span-full w-full mt-5">
+          <PaginationWithPrimaryButton
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            onPageChange={(page) =>
+              dispatch(setPagination({ currentPage: page }))
+            }
+            id={blogID as string}
+          />
+        </div>
       </section>
     </div>
   );
