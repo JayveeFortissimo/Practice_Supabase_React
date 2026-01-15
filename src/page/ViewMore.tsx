@@ -45,11 +45,11 @@ const ViewMore = () => {
                 {findBlog?.blog_title}
               </h2>
               {findBlog?.blog_subtitle && (
-                <p className="text-gray-600 mb-2 text-lg  md:text-xl lg:text-2xl ">
+                <p className="text-gray-600 mb-2 text-lg  md:text-xl lg:text-xl ">
                   {findBlog?.blog_subtitle}
                 </p>
               )}
-              <p className="text-gray-700 line-clamp-1 break-word">
+              <p className="text-gray-700 text-2xl">
                 {findBlog?.blog_description}
               </p>
             </div>

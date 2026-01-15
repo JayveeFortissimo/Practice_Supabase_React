@@ -21,6 +21,7 @@ import { setAccesToken } from "@/store/authentication";
 import type { RootState } from "@/store/storeMain";
 import { setLoading } from "@/store/authentication";
 import SpinnerCircle2 from "../common/Loading";
+import { useCallback, useEffect } from "react";
 
 const LoginForm = () => {
   const router = useNavigate();
@@ -34,11 +35,12 @@ const LoginForm = () => {
     defaultValues: {
       email: "",
       password: "",
+      rememberMe: false,
     },
   });
 
-  const { handleSubmit, reset } = form;
-
+  const { handleSubmit, reset, watch } = form;
+  console.log(watch("rememberMe"));
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
     try {
       dispatch(setLoading(true));
@@ -66,6 +68,24 @@ const LoginForm = () => {
       dispatch(setLoading(false));
     }
   }
+
+  const remember = useCallback(() => {
+    const local = localStorage.getItem("remember");
+    if (!local) {
+      return localStorage.setItem(
+        "remember",
+        JSON.stringify({ email: watch("email"), password: watch("password") })
+      );
+    } else {
+      return localStorage.removeItem("remember");
+    }
+  }, [watch]);
+
+  useEffect(() => {
+    const local = localStorage.getItem("remember");
+    watch("email", local ? JSON.parse(local).email : "");
+    watch("password", local ? JSON.parse(local).password : "");
+  }, [watch, remember]);
 
   return (
     <div className="w-full p-5 flex justify-center items-center">
@@ -129,6 +149,7 @@ const LoginForm = () => {
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        onClick={remember}
                         className="cursor-pointer"
                       />
                       <FormLabel className="text-base text-white">
