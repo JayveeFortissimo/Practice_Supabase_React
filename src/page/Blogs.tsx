@@ -1,6 +1,6 @@
 import type { RootState } from "@/store/storeMain";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { fetchBlogs } from "@/store/blogs";
 import BlogCards from "@/components/common/BlogCards";
 import { SkeletonCardGrid } from "@/components/common/SkeletonLoading";
@@ -12,18 +12,25 @@ import Sax from "@/assets/Image/Sax.jpg";
 import Violin from "@/assets/Image/Violin.jpg";
 import { setPagination } from "@/store/blogs";
 import { useNavigate } from "react-router-dom";
+import { setSearch } from "@/store/blogs";
 
 const Blogs = () => {
   const dispatch = useDispatch();
   const blogID = useId();
-  const { isLoading, blogs, pagination } = useSelector(
-    (state: RootState) => state.createBlog
-  );
+  const { isLoading, blogs, pagination, search } = useSelector((state: RootState) => state.createBlog);
   const router = useNavigate();
-
+  const [searchInput, setSearchInput] = useState("");
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      dispatch(setSearch(searchInput));
+    }, 500); 
+    return () => clearTimeout(timer);
+  }, [searchInput, dispatch]);
+  
   useEffect(() => {
     dispatch(fetchBlogs() as never);
-  }, [dispatch, pagination.currentPage]);
+  }, [dispatch, pagination.currentPage, search]);
 
   return (
     <div className="min-h-screen">
@@ -41,7 +48,12 @@ const Blogs = () => {
 
       <main className="container mx-auto px-5 md:px-0" id={blogID}>
         <section className="mb-10">
-          <Input type="text" placeholder="search ..." />
+          <Input 
+            type="text" 
+            placeholder="search ..." 
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+          />
         </section>
         {isLoading ? (
           <SkeletonCardGrid count={6} />

@@ -3,6 +3,7 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "./storeMain";
 import { toast } from "sonner";
 import supabase from "@/Supabase";
+
 interface Blog {
   blog_id: number;
   blog_img: string;
@@ -36,6 +37,7 @@ interface States {
     limit: number;
   };
   blog_Id: string;
+  search:string;
 }
 
 const initialState: States = {
@@ -61,6 +63,7 @@ const initialState: States = {
     limit: 6,
   },
   blog_Id: "",
+  search:""
 };
 
 export const postBlogs = createAsyncThunk(
@@ -117,7 +120,7 @@ export const fetchBlogs = createAsyncThunk(
   "blogs/fetchBlogs",
   async (_, { getState }) => {
     const state = getState() as RootState;
-    const { pagination } = state.createBlog;
+    const { pagination, search } = state.createBlog;
 
       const ITEMS_PER_PAGE = pagination.limit;
       const currentPage = pagination.currentPage;
@@ -125,11 +128,18 @@ export const fetchBlogs = createAsyncThunk(
       const from = (currentPage - 1) * ITEMS_PER_PAGE;
       const to = from + ITEMS_PER_PAGE - 1;
 
-      const { data, error, count } = await supabase
+      let query = supabase
         .from("Blogs")
         .select("*", { count: "exact" })
-        .order("created_at", { ascending: false })
-        .range(from, to);
+        .order("created_at", { ascending: false });
+
+      if (search && search.trim() !== "") {
+        query = query.or(
+          `blog_title.ilike.%${search}%,blog_subtitle.ilike.%${search}%,blog_description.ilike.%${search}%`
+        );
+      }
+
+      const { data, error, count } = await query.range(from, to);
 
       if (error) throw error;
 
@@ -207,6 +217,10 @@ export const createBlog = createSlice({
     ) => {
       state.blog_Id = actions.payload.blog_Id;
       state.getInputs = actions.payload.getInputs;
+    },
+    setSearch: (state, action: PayloadAction<string>) => {
+      state.search = action.payload;
+      state.pagination.currentPage = 1;
     },
   },
 
@@ -311,4 +325,5 @@ export const {
   setPagination,
   setBlogId,
   setOpenDeleteBlog,
+  setSearch
 } = createBlog.actions;

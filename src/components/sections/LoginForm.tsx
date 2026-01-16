@@ -39,8 +39,8 @@ const LoginForm = () => {
     },
   });
 
-  const { handleSubmit, reset, watch } = form;
-  console.log(watch("rememberMe"));
+  const { handleSubmit, reset, watch, setValue } = form;
+
   async function onSubmit(values: z.infer<typeof loginFormSchema>) {
     try {
       dispatch(setLoading(true));
@@ -69,23 +69,35 @@ const LoginForm = () => {
     }
   }
 
-  const remember = useCallback(() => {
-    const local = localStorage.getItem("remember");
-    if (!local) {
-      return localStorage.setItem(
-        "remember",
-        JSON.stringify({ email: watch("email"), password: watch("password") })
-      );
-    } else {
-      return localStorage.removeItem("remember");
-    }
-  }, [watch]);
+  const remember = useCallback(
+    (checked: boolean) => {
+      if (checked) {
+        localStorage.setItem(
+          "remember",
+          JSON.stringify({
+            email: watch("email"),
+            password: watch("password"),
+          })
+        );
+      } else {
+        setValue("email", "");
+        setValue("password", "");
+        localStorage.removeItem("remember");
+      }
+    },
+    [watch, setValue]
+  );
 
   useEffect(() => {
     const local = localStorage.getItem("remember");
-    watch("email", local ? JSON.parse(local).email : "");
-    watch("password", local ? JSON.parse(local).password : "");
-  }, [watch, remember]);
+
+    if (local) {
+      const parsed = JSON.parse(local);
+      setValue("email", parsed.email);
+      setValue("password", parsed.password);
+      setValue("rememberMe", true);
+    }
+  }, [setValue]);
 
   return (
     <div className="w-full p-5 flex justify-center items-center">
@@ -148,10 +160,13 @@ const LoginForm = () => {
                     <div className="flex items-center gap-5">
                       <Checkbox
                         checked={field.value}
-                        onCheckedChange={field.onChange}
-                        onClick={remember}
+                        onCheckedChange={(checked) => {
+                          field.onChange(checked === true);
+                          remember(checked === true);
+                        }}
                         className="cursor-pointer"
                       />
+
                       <FormLabel className="text-base text-white">
                         Remember me
                       </FormLabel>
