@@ -7,7 +7,6 @@ import Login from "@/page/auth/Login";
 import Register from "@/page/auth/Register";
 import Profile from "@/page/Profile";
 import ViewMore from "@/page/ViewMore";
-import RequiredAuth from "./RequiredAuth";
 
 function App() {
   const routes = createBrowserRouter([
@@ -41,13 +40,7 @@ function App() {
         },
         {
           path: "profile",
-          element: <RequiredAuth />,
-          children: [
-            {
-              index: true,
-              element: <Profile />,
-            },
-          ],
+          element: <Profile />,
         },
       ],
     },

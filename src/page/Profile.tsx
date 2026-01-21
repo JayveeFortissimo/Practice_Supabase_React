@@ -43,7 +43,6 @@ const Profile = () => {
     }
   };
 
-
   return (
     <div className="flex flex-col gap-20 min-h-screen px-3 items-center">
       <DialogItems
@@ -108,11 +107,11 @@ const Profile = () => {
         )}
 
        {
-        myBlogs?.length >0 && (
+        myBlogs?.length > 0 && (
            <div className="col-span-full w-full mt-5">
           <PaginationWithPrimaryButton
             currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
+            totalPages={myBlogs.length > 0 ? Math.ceil(myBlogs.length / pagination.limit) : 1}
             onPageChange={(page) =>
               dispatch(setPagination({ currentPage: page }))
             }
