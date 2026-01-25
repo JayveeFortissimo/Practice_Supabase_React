@@ -23,6 +23,7 @@ const ViewMore = () => {
 
   const { blogId } = useParams<{ blogId: string }>();
   const { blogs, isLoading, commentsData, isLoadingCreate } = useSelector((state: RootState) => state.createBlog);
+  const {access_token} = useSelector((state: RootState) => state.userAuthentication);
   const [comment, setComment] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -114,7 +115,19 @@ const ViewMore = () => {
                 )}
               </section>
               {/* Comment Section */}
-              <div>
+              { 
+                access_token === "" || access_token === undefined ? (
+                  <div>
+                    <p className="text-gray-500 text-sm">Please login to post a comment.</p>
+                    <Button
+                      onClick={() => router("/login")}
+                      className="mt-2"
+                    >
+                      Go to Login
+                    </Button>
+                  </div>
+                ) :
+                <div>
                 <p className="text-gray-500 text-sm">Comment</p>
                 <textarea
                   className="border p-2 rounded w-full"
@@ -142,7 +155,8 @@ const ViewMore = () => {
                     Submit
                   </Button>
                 </div>
-              </div>
+              </div>}
+
             </div>
           )}
         </div>
