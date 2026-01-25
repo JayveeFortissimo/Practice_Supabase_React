@@ -39,7 +39,6 @@ const ViewMore = () => {
   const findBlog = blogs.find((blog) => blog.blog_id === blogIdNumber);
   const findComments = commentsData.filter((comment) => comment.blogID === blogIdNumber);
 
-  console.log("Comments Data:", findComments);
   return (
     <div>
   
@@ -48,11 +47,11 @@ const ViewMore = () => {
           <DynamicSkeletone />
         ) : (
           <div className="w-full flex flex-col items-center">
-            <div className="rounded-lg overflow-hidden w-full lg:h-[35rem] mb-4">
+            <div className="relative w-full h-[35.75rem] md:h-[40rem] overflow-hidden">
               <img
                 src={findBlog?.blog_img}
                 alt=""
-                className="w-full object-cover"
+                className="w-full h-full object-cover"
               />
             </div>
 
