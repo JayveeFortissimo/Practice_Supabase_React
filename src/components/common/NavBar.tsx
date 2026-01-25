@@ -106,7 +106,7 @@ const Navbar = ({
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     navigate("/login");
-    dispatch(setAccesToken({ accessToken: "", userId: "" }));
+    dispatch(setAccesToken({ accessToken: "", userId: "", username: "" }));
   };
 
   return (

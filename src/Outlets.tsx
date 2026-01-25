@@ -27,10 +27,12 @@ const Outlets = () => {
       dispatch(setLoading(true));
       try {
         const { data } = await supabase.auth.getSession();
+        console.log("Email from outlet:", data.session?.user.user_metadata.username);
         dispatch(
           setAccesToken({
             accessToken: data.session?.access_token as string,
             userId: data.session?.user.id as string,
+            username: data.session?.user.user_metadata.username as string,
           }),
         );
       } catch (error) {

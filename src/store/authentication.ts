@@ -5,21 +5,24 @@ interface States {
   access_token: string;
   isLoading: boolean;
   user_id: string;
+  user_name:string;
 }
 
 const initialState: States = {
   access_token: "",
   isLoading: false,
-  user_id:""
+  user_id:"",
+  user_name:""
 };
 
 export const userAuthentication = createSlice({
   name: "userAuthentication",
   initialState,
   reducers: {
-    setAccesToken: (state, action: PayloadAction<{accessToken:string, userId:string}>) => {
+    setAccesToken: (state, action: PayloadAction<{accessToken:string, userId:string, username:string}>) => {
       state.access_token = action.payload.accessToken;
       state.user_id = action.payload.userId;
+      state.user_name = action.payload.username;
     },
     setLoading: (state, action:PayloadAction<boolean>) =>{
      state.isLoading = action.payload;

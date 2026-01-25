@@ -60,7 +60,7 @@ const DialogItems = ({ types, open, onOpenChange }: DialogItemsProps) => {
           ) : (
             <>
               <div className=" w-full">
-                <InputDemo dispatch={dispatch} onFileSelect={setSelectedFile} />
+                <InputDemo dispatch={dispatch} onFileSelect={setSelectedFile} type="CreateBlog"/>
               </div>
 
               <div className="flex flex-col gap-5 w-full">

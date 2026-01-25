@@ -4,27 +4,28 @@ import type { RootState } from "@/store/storeMain";
 import { useSelector, useDispatch } from "react-redux";
 import { setOpenAddBlog, setOpenUpdateBlog, setOpenDeleteBlog } from "@/store/blogs";
 import { Button } from "@/components/ui/button";
-import { fetchBlogs } from "@/store/blogs";
+import { fetchUserBlogs } from "@/store/blogs";
 import { useEffect } from "react";
 import image from "@/assets/Image/Add.png";
 import BlogCards from "@/components/common/BlogCards";
 import { SkeletonCardGrid } from "@/components/common/SkeletonLoading";
 import PaginationWithPrimaryButton from "@/components/common/Pagination";
-import { setPagination } from "@/store/blogs";
+import { setUserBlogsPagination } from "@/store/blogs";
 import { NotebookPen } from "lucide-react";
 
 const Profile = () => {
   const dispatch = useDispatch();
   const blogID = useId();
 
-  const { openAddBlog, openUpdateBlog, openDeleteBlog, blogs, isLoading, pagination } = useSelector((state: RootState) => state.createBlog);
+  const { openAddBlog, openUpdateBlog, openDeleteBlog, userBlogs, isLoading, userBlogsPagination } = useSelector((state: RootState) => state.createBlog);
   const { user_id } = useSelector((state: RootState) => state.userAuthentication);
-  const myBlogs = blogs.filter((blog) => blog.user_id === user_id);
-
+ 
+   
   useEffect(() => {
-    dispatch(fetchBlogs() as any);
-  }, [dispatch, user_id, pagination.currentPage]);
-
+    if (user_id) {
+      dispatch(fetchUserBlogs() as any);
+    }
+  }, [dispatch, user_id, userBlogsPagination.currentPage]);
   const isDialogOpen = openAddBlog || openUpdateBlog || openDeleteBlog;
   const dialogType = openAddBlog ? "Create" : "Update";
    const forDelete = openDeleteBlog ? "Delete" : "";
@@ -42,7 +43,6 @@ const Profile = () => {
       }
     }
   };
-
   return (
     <div className="flex flex-col gap-20 min-h-screen px-3 items-center">
       <DialogItems
@@ -68,7 +68,7 @@ const Profile = () => {
       <section className="border min-h-[30rem] w-full p-3 container mx-auto">
         {isLoading ? (
           <SkeletonCardGrid count={6} />
-        ) : myBlogs?.length === 0 ? (
+        ) : userBlogs?.length === 0 ? (
           <div className="border min-h-[30rem] w-full p-3 flex flex-col gap-2 justify-center items-center">
             <img
               src={image}
@@ -82,8 +82,8 @@ const Profile = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {myBlogs?.length > 0 &&
-              myBlogs?.map((blog) => {
+            {userBlogs?.length > 0 &&
+              userBlogs?.map((blog) => {
                 return (
                   <div key={blog?.blog_id}>
                     <BlogCards
@@ -106,20 +106,18 @@ const Profile = () => {
           </div>
         )}
 
-       {
-        myBlogs?.length > 0 && (
+       {userBlogs?.length > 0 && (
            <div className="col-span-full w-full mt-5">
           <PaginationWithPrimaryButton
-            currentPage={pagination.currentPage}
-            totalPages={myBlogs.length > 0 ? Math.ceil(myBlogs.length / pagination.limit) : 1}
+            currentPage={userBlogsPagination.currentPage}
+            totalPages={userBlogsPagination.totalPages}
             onPageChange={(page) =>
-              dispatch(setPagination({ currentPage: page }))
+              dispatch(setUserBlogsPagination({ currentPage: page }))
             }
             id={blogID as string}
           />
         </div>
-        )
-       }
+        )}
       </section>
     </div>
   );

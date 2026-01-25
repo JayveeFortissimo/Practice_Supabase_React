@@ -26,23 +26,24 @@ const ImagePreview = ({url, onRemove,}: { url: string; onRemove: () => void;}) =
 );
 
 interface InputDemoProps {
-  dispatch: AppDispatch;
-  onFileSelect: (file: File | null) => void;
+  dispatch?: AppDispatch;
+  onFileSelect?: (file: File | null) => void;
+  type?: "comment" | "CreateBlog";
 }
 
-export default function InputDemo({ dispatch, onFileSelect }: InputDemoProps) {
+export default function InputDemo({ dispatch, onFileSelect, type }: InputDemoProps) {
   const blogImagePreview = useSelector(
     (state: RootState) => state.createBlog.getInputs.blog_image_preview
   );
 
   const handleRemove = () => {
-    onFileSelect(null);
-    dispatch(setInputs({ blog_image_preview: null }));
+    onFileSelect?.(null);
+    dispatch?.(setInputs({ blog_image_preview: null }));
   };
 
   return (
-    <div className="w-full max-w-40">
-      <Label htmlFor="profile">Picture</Label>
+    <div className={`w-full ${type === "comment" ? "max-w-15" : "max-w-40"}`}>
+      <Label htmlFor="profile" className={type === "comment" ? "hidden": "block"}>Picture</Label>
       <div className="mt-2 w-full">
         {blogImagePreview ? (
           <ImagePreview
@@ -55,8 +56,8 @@ export default function InputDemo({ dispatch, onFileSelect }: InputDemoProps) {
               const file = acceptedFiles[0];
               if (file) {
                 const imageUrl = URL.createObjectURL(file);
-                onFileSelect(file);
-                dispatch(setInputs({ blog_image_preview: imageUrl }));
+                onFileSelect?.(file);
+                dispatch?.(setInputs({ blog_image_preview: imageUrl }));
               }
             }}
             accept={{
