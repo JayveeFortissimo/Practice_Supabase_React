@@ -46,7 +46,7 @@ export const postBlogs = createAsyncThunk(
     const userId = state.userAuthentication.user_id;
     const { blog_title, blog_description, blog_subtitle } = getInputs;
 
-    if (!blog_title || !blog_description || !blog_subtitle || !blogImage) {
+    if (!blog_title || !blog_description || !blog_subtitle) {
       toast.error("Fields are required!");
       return rejectWithValue("Fields are required!");
     }
